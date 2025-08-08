@@ -1,11 +1,20 @@
 FROM node:18
 
+# Set working directory
 WORKDIR /app
 
+# Pre-copy package files only (optimizes Docker layer caching)
 COPY frontend/package.json frontend/package-lock.json ./
-RUN npm install
 
+# Clean npm cache (optional but recommended in low-space environments)
+RUN npm cache clean --force && \
+    npm install --legacy-peer-deps
+
+# Now copy the rest of the application
 COPY frontend ./
 
+# Expose React dev server port
 EXPOSE 3000
+
+# Start the app
 CMD ["npm", "start"]
